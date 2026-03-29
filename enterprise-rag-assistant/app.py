@@ -69,6 +69,12 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    # New Conversation button — resets chat history and Bedrock session context
+    if st.sidebar.button("🔄 New Conversation", use_container_width=True):
+        st.session_state.messages = []
+        rag_engine.reset_session()
+        st.rerun()
+
     # Display chat history
     for msg_idx, msg in enumerate(st.session_state.messages):
         chat_message_component(msg["role"], msg["content"])

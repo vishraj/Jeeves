@@ -12,6 +12,12 @@ class KnowledgeBaseRAG(RAGInterface):
         _inference_profile_prefixes = ("global.", "us.", "eu.", "ap.")
         if ":" in Config.MODEL_ID or Config.MODEL_ID.startswith(_inference_profile_prefixes):
             self.model_arn = Config.MODEL_ID
+        # Session ID for maintaining conversation context across multiple questions
+        self.session_id = None
+
+    def reset_session(self):
+        """Clear the current session so the next question starts a fresh conversation."""
+        self.session_id = None
 
     def ask(self, question: str) -> dict:
         if not self.kb_id:
@@ -21,16 +27,24 @@ class KnowledgeBaseRAG(RAGInterface):
             }
 
         try:
-            response = aws_manager.bedrock_agent_runtime.retrieve_and_generate(
-                input={'text': question},
-                retrieveAndGenerateConfiguration={
+            request_params = {
+                'input': {'text': question},
+                'retrieveAndGenerateConfiguration': {
                     'type': 'KNOWLEDGE_BASE',
                     'knowledgeBaseConfiguration': {
                         'knowledgeBaseId': self.kb_id,
                         'modelArn': self.model_arn
                     }
                 }
-            )
+            }
+            # Pass session ID if we have one to maintain conversation context
+            if self.session_id:
+                request_params['sessionId'] = self.session_id
+
+            response = aws_manager.bedrock_agent_runtime.retrieve_and_generate(**request_params)
+
+            # Capture the session ID for the next turn
+            self.session_id = response.get('sessionId')
 
             answer = response.get('output', {}).get('text', "")
             citations = self._parse_citations(response.get('citations', []))

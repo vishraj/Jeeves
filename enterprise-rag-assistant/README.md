@@ -1,6 +1,6 @@
 # 🏢 Jeeves: Enterprise RAG Assistant
 
-Jeeves is a professional, session-aware AI assistant designed for the enterprise. Built with **Streamlit**, **Amazon Bedrock**, and **AWS Sample DynamoDB**, it provides a secure and persistent conversational experience over your private business documents.
+Jeeves is a professional, session-aware AI assistant designed for the enterprise. Built with **Streamlit**, **Amazon Bedrock**, and **AWS DynamoDB**, it provides a secure and persistent conversational experience over your private business documents.
 
 Inspired by the impeccable valet from P.G. Wodehouse's stories, Jeeves offers refined, context-aware assistance with an enterprise-grade UI.
 

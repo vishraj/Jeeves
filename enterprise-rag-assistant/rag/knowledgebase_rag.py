@@ -19,21 +19,75 @@ class KnowledgeBaseRAG(RAGInterface):
         """Clear the current session so the next question starts a fresh conversation."""
         self.session_id = None
 
-    def ask(self, question: str) -> dict:
+    def ask(self, question: str, history=None) -> dict:
+        """
+        Submits a question to the Knowledge Base. 
+        If 'history' is provided, we prepend the contextual summary to ensure continuity 
+        across sessions (important when session_id expires).
+        """
         if not self.kb_id:
             return {
                 "answer": "Error: KNOWLEDGE_BASE_ID is not configured.",
                 "citations": []
             }
 
+        # 1. Build context-aware prompt if history is present
+        # Note: Bedrock's retrieve_and_generate handles multi-turn naturally IF session_id is active.
+        # However, if we're resuming an old session, session_id may be dead.
+        # We handle this by injecting context manually when history is available.
+        final_question = question
+        if history and len(history) > 0:
+            # Simple context injector: provide last 4 turns (2 user-assistant pairs)
+            recent_context = "\n".join([f"{m['role'].capitalize()}: {m['content'][:200]}..." 
+                                         for m in history[-4:]])
+            final_question = (
+                "## CONVERSATION HISTORY\n"
+                f"{recent_context}\n\n"
+                "## INSTRUCTION\n"
+                "Answer the user's question based on the above context and your knowledge base. "
+                "Adhere to any formatting requirements (like JSON blocks) mentioned in the prompt below.\n\n"
+                "## USER QUESTION\n"
+                f"{question}"
+            )
+
+        # Define a custom prompt template to ensure visualization requirements are respected
+        # The '$search_results$' and '$input_text$' placeholders are required by Bedrock.
+        prompt_template = (
+            "You are Jeeves, a professional enterprise AI assistant. "
+            "Answer the user's question based strictly on the following source snippets. "
+            "If the information is not in the snippets, clearly state that you don't know.\n\n"
+            "## SOURCE SNIPPETS\n"
+            "$search_results$\n\n"
+            "## USER REQUEST\n"
+            "$input_text$\n\n"
+            "--- MANDATORY FORMATTING ---\n"
+            "If the user asks for a chart, graph, visualization, or trend (line, bar, pie, histogram), "
+            "you MUST provide the structured data at the end of your response in a hidden JSON block.\n"
+            "Format precisely like this:\n"
+            "```json\n"
+            "{\n"
+            "  \"chart_type\": \"bar|line|pie|histogram\",\n"
+            "  \"x_axis\": \"label_x\",\n"
+            "  \"y_axis\": \"label_y\",\n"
+            "  \"data\": [{\"label_x\": \"Value A\", \"label_y\": 10}]\n"
+            "}\n"
+            "```\n"
+            "Assistant:"
+        )
+
         try:
             request_params = {
-                'input': {'text': question},
+                'input': {'text': final_question},
                 'retrieveAndGenerateConfiguration': {
                     'type': 'KNOWLEDGE_BASE',
                     'knowledgeBaseConfiguration': {
                         'knowledgeBaseId': self.kb_id,
-                        'modelArn': self.model_arn
+                        'modelArn': self.model_arn,
+                        'generationConfiguration': {
+                            'promptTemplate': {
+                                'textPromptTemplate': prompt_template
+                            }
+                        }
                     }
                 }
             }
@@ -48,16 +102,18 @@ class KnowledgeBaseRAG(RAGInterface):
 
             answer = response.get('output', {}).get('text', "")
             citations = self._parse_citations(response.get('citations', []))
-
-            # Logic to detect visualization request could be added here or in the UI layer
-            # For a cleaner separation, we'll keep it simple here and handle extraction 
-            # as a secondary step if needed.
             
             return {
                 "answer": answer,
-                "citations": citations
+                "citations": citations,
+                "session_id": self.session_id
             }
         except Exception as e:
+            # If session is expired, try one more time without the session_id
+            if "expired" in str(e).lower() and self.session_id:
+                self.session_id = None
+                return self.ask(question, history=history)
+            
             return {
                 "answer": f"An error occurred: {str(e)}",
                 "citations": []

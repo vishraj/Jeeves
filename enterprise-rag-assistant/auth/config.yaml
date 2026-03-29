@@ -1,0 +1,18 @@
+cookie:
+  expiry_days: 7
+  key: jeeves_auth_cookie
+  name: jeeves_auth_cookie
+credentials:
+  usernames:
+    admin:
+      email: admin@example.com
+      name: Admin User
+      password: $2b$12$xhhwXRk20gIxppKRV3QCG.M0DcbQTqxvC3nUxJ3pr1YbQuYsjDA7.
+    vishwak:
+      email: vishwak@example.com
+      name: Vishwak
+      password: $2b$12$eZM4cG22aH06Q2o31aVqOeUjB10KJwo8CLF1PSJ0WmxnuoY3HFcyC
+preauthorized:
+  emails:
+  - admin@example.com
+  - vishwak@example.com

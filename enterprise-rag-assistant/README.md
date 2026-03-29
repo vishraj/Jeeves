@@ -1,80 +1,107 @@
-# Enterprise Document AI Assistant
+# 🏢 Jeeves: Enterprise RAG Assistant
 
-A clean, modular Python application implementing an enterprise-style Retrieval Augmented Generation (RAG) system using AWS Services.
+Jeeves is a professional, session-aware AI assistant designed for the enterprise. Built with **Streamlit**, **Amazon Bedrock**, and **AWS Sample DynamoDB**, it provides a secure and persistent conversational experience over your private business documents.
+
+Inspired by the impeccable valet from P.G. Wodehouse's stories, Jeeves offers refined, context-aware assistance with an enterprise-grade UI.
+
+---
+
+## ✨ Key Features
+
+- **🔐 Secure Authentication**: Integrated `streamlit-authenticator` with cookie-based persistence and `bcrypt` password hashing.
+- **📚 Intelligent RAG**: Leverages Amazon Bedrock Knowledge Bases to query your private documents with verbatim citations.
+- **💾 Persistent Chat History**: Conversations are stored in AWS DynamoDB, allowing users to resume chats across devices and sessions.
+- **📊 Automatic Data Visualization**: Detects data trends and automatically renders interactive **Plotly** charts (Line, Bar, Pie, etc.).
+- **💬 Multi-turn Continuity**: Uses Bedrock `sessionId` and manual context injection to maintain a cohesive "memory" during long conversations.
+- **🎨 Premium Enterprise UI**: A polished "Glassmorphism" sidebar and centered login card with custom branding.
+
+---
 
 ## 🏗️ Architecture
 
-- **Frontend**: Streamlit
-- **Orchestration**: Python with Boto3
-- **RAG Engine**: Amazon Bedrock Knowledge Bases
-- **LLM**: Anthropic Claude 3.5 Sonnet
-- **Storage**: Amazon S3
-- **Vector DB**: Amazon OpenSearch Serverless
+```mermaid
+graph TD
+    User((User)) -->|HTTPS| StreamlitUI[Streamlit UI]
+    StreamlitUI -->|Auth| Authenticator[Streamlit Authenticator]
+    
+    subgraph "Logic Layer"
+        StreamlitUI -->|Query| RAGEngine[KnowledgeBaseRAG]
+        RAGEngine -->|Retrieve & Gen| Bedrock[Amazon Bedrock KB]
+        StreamlitUI -->|Persist| ChatStore[DynamoDB ChatStore]
+    end
+    
+    subgraph "Data Layer"
+        Bedrock -->|Sources| S3Bucket[S3 Document Store]
+        ChatStore -->|Save/Load| DDB[(JeevesChatHistory Table)]
+    end
+```
 
-### How it Works
-1. **Ingestion**: Documents uploaded to S3 are processed by Bedrock Knowledge Base (chunking, embedding, and storage in OpenSearch).
-2. **Retrieval**: User queries are sent to the `retrieve_and_generate` API.
-3. **Generation**: Claude generates a response based *only* on the retrieved document context.
-4. **Visualization**: If the user requests data visualization, the system prompts the LLM to extract structured data and renders interactive charts using Plotly.
+---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.13+
-- AWS Account with Bedrock, S3, and OpenSearch permissions.
-- Configured Bedrock Knowledge Base.
+### 1. Prerequisites
+- **Python 3.9+**
+- **AWS Account** with Bedrock Knowledge Base and DynamoDB access.
+- **AWS CLI** configured (via `aws configure` or SSO).
 
-### Setup
-1. Clone the repository and navigate to the project folder.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Create a `.env` file in the root directory (using `.env.example` as a template):
-   ```env
-   AWS_REGION=us-east-1
-   KNOWLEDGE_BASE_ID=your-kb-id
-   MODEL_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
-   ```
+### 2. AWS Resources
+Create the following resources in your AWS account:
+- **DynamoDB Table**: `JeevesChatHistory`
+  - Partition Key: `user_id` (String)
+  - Sort Key: `conversation_id` (String)
+- **Bedrock Knowledge Base**: Note your `KNOWLEDGE_BASE_ID` and `MODEL_ARN`.
 
-### Execution
-Run the application locally:
+### 3. Installation
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd Jeeves
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Or .venv\Scripts\activate on Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 4. Configuration
+Create a `.env` file in the root directory:
+```env
+KNOWLEDGE_BASE_ID=your_id_here
+MODEL_ARN=arn:aws:bedrock:...foundation-model/anthropic.claude-3-5-sonnet-v2:0
+AWS_DEFAULT_REGION=us-east-1
+# OPTIONAL: if using specific credentials
+# AWS_ACCESS_KEY_ID=...
+# AWS_SECRET_ACCESS_KEY=...
+```
+
+Configure your users in `auth/config.yaml`:
+```yaml
+credentials:
+  usernames:
+    admin:
+      email: admin@example.com
+      name: Admin User
+      password: <hashed_password_via_bcrypt>
+```
+
+### 5. Running the App
 ```bash
 streamlit run app.py
 ```
 
-## 📁 Project Structure
-```text
-enterprise-rag-assistant/
-├── app.py              # Main application entry point
-├── rag/
-│   ├── rag_interface.py # Abstract RAG class
-│   ├── knowledgebase_rag.py # AWS Knowledge Base implementation
-│   └── manual_rag.py    # Stub for custom RAG
-├── utils/
-│   ├── aws_clients.py   # Boto3 client management
-│   └── config.py        # Configuration manager
-├── ui/
-│   └── components.py    # Reusable Streamlit components
-└── requirements.txt     # Python dependencies
-```
+---
 
-## 🔧 AWS Configuration Guide
+## 🛠️ Tech Stack
+- **Frontend**: [Streamlit](https://streamlit.io/)
+- **Large Language Model**: [Anthropic Claude 3.5 Sonnet](https://www.anthropic.com/) via Amazon Bedrock.
+- **Persistence**: [AWS DynamoDB](https://aws.amazon.com/dynamodb/)
+- **Visualizations**: [Plotly Express](https://plotly.com/python/plotly-express/)
+- **Authentication**: [Streamlit-Authenticator](https://github.com/mkhorasani/Streamlit-Authenticator)
 
-1. **S3 Bucket**: Create a bucket and upload your PDF/Word/Excel docs.
-2. **Vector Store**: Create an Amazon OpenSearch Serverless collection (Vector search type).
-3. **Knowledge Base**: 
-   - Go to Bedrock Console -> Knowledge Bases.
-   - Link S3 as the data source.
-   - Link OpenSearch Serverless as the vector store.
-   - Note down the **Knowledge Base ID**.
-4. **Cloud Shell / Local Auth**: Ensure your local environment has active AWS credentials (via `aws configure` or environment variables).
+---
 
-## 📊 Visualization Capabilities
-The assistant can generate:
-- Bar Charts
-- Line Charts
-- Pie Charts
-- Histograms
-
-Simply ask: *"Show me a bar chart of the sales by region"* or *"Visualize the distribution of market share."*
+## 🎩 Branding
+The project uses custom branding located in `assets/logo.png`. To change the logo, simply replace this file with your own 200x200 pixel PNG.

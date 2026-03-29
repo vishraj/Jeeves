@@ -87,11 +87,13 @@ def history_sidebar_component(chat_store, user_id):
             
             if cols[0].button(btn_label, key=f"load_{conv_id}", use_container_width=True, 
                               type="secondary" if not is_active else "primary"):
-                st.session_state.messages = conv.get('messages', [])
-                st.session_state.current_conv_id = conv_id
-                if "rag_engine" in st.session_state:
-                    st.session_state.rag_engine.session_id = conv.get('bedrock_session_id')
-                st.rerun()
+                # Safety check: don't reload if we are already in the same conversation
+                if not is_active:
+                    st.session_state.messages = conv.get('messages', [])
+                    st.session_state.current_conv_id = conv_id
+                    if "rag_engine" in st.session_state:
+                        st.session_state.rag_engine.session_id = conv.get('bedrock_session_id')
+                    st.rerun()
             
             if cols[1].button("🗑️", key=f"del_{conv_id}", use_container_width=True, help="Delete Chat"):
                 if chat_store.delete_conversation(user_id, conv_id):

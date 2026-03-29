@@ -178,19 +178,24 @@ def main():
                 })
                 
                 # Persistence: Save full conversation to DynamoDB
-                # The first user message is typically used for the title.
-                title = st.session_state.messages[0]["content"] if st.session_state.messages else "New Chat"
-                chat_store.save_conversation(
+                # The first user message is used for the title.
+                current_messages = st.session_state.messages
+                title = current_messages[0]["content"] if current_messages else "New Chat"
+                
+                if chat_store.save_conversation(
                     user_id=user_id,
                     conversation_id=st.session_state.current_conv_id,
                     title=title,
-                    messages=st.session_state.messages,
+                    messages=current_messages,
                     bedrock_session_id=st.session_state.rag_engine.session_id
-                )
+                ):
+                    st.toast("✅ Conversation Saved", icon="💾")
+                else:
+                    st.error("Error saving conversation to DynamoDB.")
+                    print(f"DEBUG: Save failed for user {user_id}, conv {st.session_state.current_conv_id}")
                 
-                # Rerun to update sidebar conversation title if it was the first turn
-                if len(st.session_state.messages) <= 2:
-                    st.rerun()
+                # Rerun to update sidebar and sync state with DB
+                st.rerun()
 
 if __name__ == "__main__":
     Config.validate()

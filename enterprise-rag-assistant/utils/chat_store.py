@@ -23,7 +23,8 @@ class ChatStore:
         try:
             response = self.table.query(
                 KeyConditionExpression="user_id = :uid",
-                ExpressionAttributeValues={":uid": user_id}
+                ExpressionAttributeValues={":uid": user_id},
+                ConsistentRead=True
             )
             items = response.get('Items', [])
             # Sort locally since DynamoDB sorts by sort key (conversation_id) only by default

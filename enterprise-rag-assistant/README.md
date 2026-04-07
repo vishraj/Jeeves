@@ -9,11 +9,21 @@ Inspired by the impeccable valet from P.G. Wodehouse's stories, Jeeves offers re
 ## ✨ Key Features
 
 - **🔐 Secure Authentication**: Integrated `streamlit-authenticator` with cookie-based persistence and `bcrypt` password hashing.
-- **📚 Intelligent RAG**: Leverages Amazon Bedrock Knowledge Bases to query your private documents with verbatim citations.
-- **💾 Persistent Chat History**: Conversations are stored in AWS DynamoDB, allowing users to resume chats across devices and sessions.
-- **📊 Automatic Data Visualization**: Detects data trends and automatically renders interactive **Plotly** charts (Line, Bar, Pie, etc.).
-- **💬 Multi-turn Continuity**: Uses Bedrock `sessionId` and manual context injection to maintain a cohesive "memory" during long conversations.
-- **🎨 Premium Enterprise UI**: A polished "Glassmorphism" sidebar and centered login card with custom branding.
+- **🖥️ Unified Wide Layout**: A consistent, full-width dashboard experience initialized at the entry point for immersive data analysis.
+- **🎯 Responsive Centered Login**: A custom-ratio centering system (`3:2:3`) ensures the login card remains perfectly sized and centered on any display, from standard laptops to ultra-wide monitors.
+- **📚 Intelligent RAG**: Leverages a custom 2-step retrieval and generation process via Amazon Bedrock for maximum citation accuracy.
+- **💾 Persistent Chat History**: Full conversation persistence using AWS DynamoDB, allowing users to resume chats seamlessly.
+- **📊 Automatic Data Visualization**: Detects numerical trends in document data and automatically renders interactive **Plotly** visualizations.
+- **🎨 Premium UI/UX**: Custom CSS-enhanced "Glassmorphism" design with a blurred sidebar and sleek dark-mode aesthetics.
+
+---
+
+## 🎨 Design Philosophy
+
+Jeeves is crafted to feel like a high-end enterprise tool rather than a generic chat bot.
+1. **Consistency**: The "Wide" layout is set globally at the start of the application lifecycle to prevent visual shifting during navigation.
+2. **Visual Hierarchy**: Critical actions (New Conversation, Profiles) are isolated in a blur-effect sidebar, keeping the main focus on the data and the conversation.
+3. **Clarity**: Citations are rendered in collapsible containers to keep the UI clean while maintaining full transparency of source materials.
 
 ---
 
@@ -50,7 +60,7 @@ Create the following resources in your AWS account:
 - **DynamoDB Table**: `JeevesChatHistory`
   - Partition Key: `user_id` (String)
   - Sort Key: `conversation_id` (String)
-- **Bedrock Knowledge Base**: Note your `KNOWLEDGE_BASE_ID` and `MODEL_ARN`.
+- **Bedrock Knowledge Base**: Note your `KNOWLEDGE_BASE_ID` and `MODEL_ID`.
 
 ### 3. Installation
 ```bash
@@ -70,22 +80,11 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory:
 ```env
 KNOWLEDGE_BASE_ID=your_id_here
-MODEL_ARN=arn:aws:bedrock:...foundation-model/anthropic.claude-3-5-sonnet-v2:0
+MODEL_ID=anthropic.claude-3-5-sonnet-v2:0
 AWS_DEFAULT_REGION=us-east-1
-# OPTIONAL: if using specific credentials
-# AWS_ACCESS_KEY_ID=...
-# AWS_SECRET_ACCESS_KEY=...
 ```
 
-Configure your users in `auth/config.yaml`:
-```yaml
-credentials:
-  usernames:
-    admin:
-      email: admin@example.com
-      name: Admin User
-      password: <hashed_password_via_bcrypt>
-```
+Configure your users in `auth/config.yaml`.
 
 ### 5. Running the App
 ```bash

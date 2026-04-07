@@ -95,7 +95,7 @@ streamlit run app.py
 
 ## 🛠️ Tech Stack
 - **Frontend**: [Streamlit](https://streamlit.io/)
-- **Large Language Model**: [Anthropic Claude 3.5 Sonnet](https://www.anthropic.com/) via Amazon Bedrock.
+- **Large Language Model**: [Anthropic Claude 4.6 Sonnet](https://www.anthropic.com/) via Amazon Bedrock.
 - **Persistence**: [AWS DynamoDB](https://aws.amazon.com/dynamodb/)
 - **Visualizations**: [Plotly Express](https://plotly.com/python/plotly-express/)
 - **Authentication**: [Streamlit-Authenticator](https://github.com/mkhorasani/Streamlit-Authenticator)

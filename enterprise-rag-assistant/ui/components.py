@@ -3,8 +3,6 @@ from datetime import datetime
 import os
 
 def header_component():
-    st.set_page_config(page_title="Jeeves: Enterprise AI", layout="wide")
-    
     # Hero Header with Logo
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
@@ -20,7 +18,6 @@ def header_component():
 
 def login_header_component():
     """Header shown on the login page specifically."""
-    st.set_page_config(page_title="Login | Jeeves AI", page_icon="🔐")
     
     # Custom CSS for a professional login page
     st.markdown("""

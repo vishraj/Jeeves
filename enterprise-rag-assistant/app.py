@@ -1,4 +1,12 @@
 import streamlit as st
+
+st.set_page_config(
+    page_title="Jeeves: Enterprise AI", 
+    page_icon="🔐", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import plotly.express as px
 import json
@@ -87,7 +95,7 @@ def main():
         login_header_component()
         
         # Centered Login Card using Native Container
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2, col3 = st.columns([3, 2, 3])
         with col2:
             with st.container(border=True):
                 # Branded Logo and Title

@@ -1,0 +1,92 @@
+🔍 Use Case #2: Automated Communication Intelligence
+Business Problem
+The External Communications team faces an overload of:
+•	Incoming inquiries from media, public, and stakeholders
+•	The need to constantly monitor public sentiment on monetary policy, central bank actions, and macroeconomic conditions
+This creates a bottleneck for:
+•	Timely responses
+•	Consistent messaging
+•	Early detection of reputational risk
+•	Data-driven communication strategy 
+🎯 Hackathon Goal
+Build an AI system that becomes a virtual assistant for the Communications team by automating:
+1.	Classification of incoming emails/queries
+2.	Drafting standard responses for recurring categories
+3.	Sentiment analysis on public discourse
+4.	Trending-topic detection across media + social
+5.	Communication risk alerts
+6.	Automated communication insights dashboard/reporting 
+🌟 What Product Are We Actually Envisioning?
+A single unified interface that ingests an inquiry, performs full NLP analysis (classification, sentiment, topics), generates a safe draft response, and displays an insights dashboard with sentiment trends, topic clouds, and risk alerts — all wrapped in basic RAI controls and explainability.
+⭐ MVP Definition 
+This must deliver three value pillars:
+Pillar 1 — Automated Inquiry Understanding
+•	Text classification
+•	Sentiment analysis
+•	Topic modeling
+•	Key phrase extraction
+For a Federal Reserve team, classification+sentiment+topic are the minimum needed to determine:
+•	Whether a message signals market sensitivity
+•	Whether there is coordinated sentiment activity
+•	Whether misinformation or policy confusion is trending
+Pillar 2 — AI Draft Response Generation
+For a Fed communications team, consistency and accuracy are essential.
+An MVP must provide:
+•	A safe, neutral, professional draft
+•	A human-in-the-loop review space
+•	A clear explanation of the response basis
+
+Pillar 3 — Insight Layer 
+Your file’s architecture and UI include an Insights Aggregator Layer and a Dashboard/UI layer with:
+•	Sentiment trend graph
+•	Trending topics cloud
+•	Risk alerts
+
+Why essential for the Federal Reserve?
+•	Sentiment trend shifts may signal the start of misinformation waves
+•	Topic spikes may indicate coordinated narratives
+•	Risk indicators must be surfaced immediately for leadership
+A true MVP for an external comms use case must enable leadership awareness, even in a basic form.
+
+
+Key Product components
+1. Ingestion
+•	Manual paste OR simple upload
+•	Stored in a minimal storage layer (S3)
+2. Automated NLP Analysis
+•	Category
+•	Sentiment
+•	Topic modeling
+•	(Optional but recommended: key phrase extraction)
+3. LLM Draft Response Panel
+•	Editable draft
+•	Clear explainability note
+•	RAI safeguards (“no policy predictions,” etc.)
+4. Insights Dashboard
+•	Sentiment trend line (last 7 days or customizable time periods)
+•	Trending topics cloud
+•	Risk alerts
+
+⭐ What Else Should Be in the MVP (features that have not been asked)?
+Because this product is for a Federal Reserve External Communications team, there are implicit requirements that must be included even if not spelled out:
+1. Strict Responsible AI Guardrails
+Already mentioned in your demo script:
+•	No policy predictions
+•	No financial advice
+•	Human in the loop review
+These are mandatory at the Fed. Not optional.
+2. Auditability & Traceability
+Even in MVP:
+•	Show which model generated the response
+•	Show inputs used for classification
+•	Provide timestamp and version
+Why? For a central bank communication team, traceability = non-negotiable.
+3. Access Control
+Even lightweight:
+•	Only authenticated team members access the tool
+•	Role-based “viewer vs reviewer” control if possible
+4. Sanitization of User Input
+Fed comms teams deal with:
+•	Sensitive inquiries
+•	Potentially harmful or misinformed content 
+
